@@ -39,6 +39,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           event.productDetails.remove('image');
           event.productDetails.remove('image_name');
 
+          event.productDetails['shop_user_id'] =
+              Supabase.instance.client.auth.currentUser!.id;
+
           await table.insert(event.productDetails);
           emit(ProductSuccessState());
         } else if (event is EditProductEvent) {

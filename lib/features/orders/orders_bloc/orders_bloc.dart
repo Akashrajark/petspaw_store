@@ -19,7 +19,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
 
         if (event is GetAllOrdersEvent) {
           PostgrestFilterBuilder<List<Map<String, dynamic>>> query = table
-              .select('*, customers(name)')
+              .select('*, customers!inner(*),order_items(*,shop_products(*))')
               .eq('status', event.params['status']);
           if (event.params['query'] != null) {
             query = query.ilike('customers.name', '%${event.params['query']}%');
@@ -27,7 +27,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           table.select('*');
 
           List<Map<String, dynamic>> orders =
-              await query.order('pickup_time', ascending: true);
+              await query.order('created_at', ascending: true);
 
           emit(OrdersGetSuccessState(orders: orders));
         } else if (event is AddOrderEvent) {
